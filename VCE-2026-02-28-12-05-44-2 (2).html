@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scholarship Application System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-r from-blue-100 to-purple-200 font-sans">
+
+<div class="w-full max-w-screen-2xl mx-auto p-8 space-y-8">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center">
+<h1 class="text-3xl font-bold text-purple-700">Scholarship Application System</h1>
+<button onclick="showLogin()" class="bg-black text-white px-4 py-2 rounded text-sm">
+Admin Panel
+</button>
+</div>
+
+<!-- ================= REGISTRATION ================= -->
+<div id="registrationSection" class="bg-white p-8 rounded-xl shadow">
+
+<h2 class="text-2xl font-bold mb-6 text-center text-purple-700">
+Applicant Registration
+</h2>
+
+<form id="registrationForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+
+<input type="text" name="name" placeholder="Full Name" required class="border p-2 rounded"/>
+<input type="text" name="studentId" placeholder="Student ID Number" required class="border p-2 rounded"/>
+<input type="text" name="school" placeholder="School" required class="border p-2 rounded"/>
+<input type="text" name="course" placeholder="Course" required class="border p-2 rounded"/>
+<input type="date" name="dob" required class="border p-2 rounded"/>
+<input type="email" name="email" placeholder="Email" required class="border p-2 rounded"/>
+<input type="text" name="phone" placeholder="Phone Number" required class="border p-2 rounded"/>
+
+<select name="yearLevel" required class="border p-2 rounded">
+<option value="">Year Level</option>
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>4th Year</option>
+</select>
+
+<div class="md:col-span-4 text-center">
+<button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded text-sm">
+Submit Application
+</button>
+</div>
+
+</form>
+</div>
+
+<!-- ================= LOGIN MODAL ================= -->
+<div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+<div class="bg-white p-6 rounded w-72">
+<h2 class="text-lg font-bold mb-4 text-center">Admin Login</h2>
+<input type="password" id="adminPassword" placeholder="Enter Password"
+class="border p-2 w-full mb-4 rounded text-sm"/>
+<button onclick="loginAdmin()" class="bg-blue-600 text-white w-full py-2 rounded text-sm">
+Login
+</button>
+</div>
+</div>
+
+<!-- ================= ADMIN SECTION ================= -->
+<div id="adminSection" class="hidden space-y-6">
+
+<div class="flex justify-between items-center">
+<h2 class="text-2xl font-bold text-blue-700">Admin Dashboard</h2>
+<button onclick="logoutAdmin()" class="bg-red-600 text-white px-4 py-2 rounded text-sm">
+Logout
+</button>
+</div>
+
+<!-- DASHBOARD CARDS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+
+<div onclick="openSection('Pending')" 
+class="cursor-pointer bg-yellow-50 p-4 rounded-xl shadow flex flex-col justify-center items-center h-24">
+<h3 class="text-xs font-semibold uppercase">Pending</h3>
+<p id="pendingCount" class="text-2xl font-bold text-yellow-600">0</p>
+</div>
+
+<div onclick="openSection('Approved')" 
+class="cursor-pointer bg-green-50 p-4 rounded-xl shadow flex flex-col justify-center items-center h-24">
+<h3 class="text-xs font-semibold uppercase">Approved</h3>
+<p id="approvedCount" class="text-2xl font-bold text-green-600">0</p>
+</div>
+
+<div onclick="openSection('Rejected')" 
+class="cursor-pointer bg-red-50 p-4 rounded-xl shadow flex flex-col justify-center items-center h-24">
+<h3 class="text-xs font-semibold uppercase">Rejected</h3>
+<p id="rejectedCount" class="text-2xl font-bold text-red-600">0</p>
+</div>
+
+<div onclick="openAllApplicants()" 
+class="cursor-pointer bg-blue-50 p-4 rounded-xl shadow flex flex-col justify-center items-center h-24">
+<h3 class="text-xs font-semibold uppercase">All Applicants</h3>
+<p id="totalApplicantsCard" class="text-2xl font-bold text-blue-600">0</p>
+</div>
+
+</div>
+
+<!-- TABLE VIEW -->
+<div id="tableView" class="hidden bg-white p-4 rounded-xl shadow mt-4">
+<div class="flex justify-between items-center mb-3">
+<h2 id="sectionTitle" class="text-lg font-bold"></h2>
+<button onclick="backDashboard()" class="bg-gray-500 text-white px-3 py-1 rounded text-xs">
+Back
+</button>
+</div>
+
+<table class="w-full text-center border text-xs">
+<thead class="bg-purple-200">
+<tr>
+<th class="p-2">#</th>
+<th class="p-2">Name</th>
+<th class="p-2">ID</th>
+<th class="p-2">School</th>
+<th class="p-2">Course</th>
+<th class="p-2">Year</th>
+<th class="p-2">Status</th>
+<th class="p-2">Action</th>
+</tr>
+</thead>
+<tbody id="allTable"></tbody>
+</table>
+</div>
+
+<!-- SIMPLE ALL APPLICANTS VIEW -->
+<div id="allApplicantsSimple" class="hidden bg-white p-6 rounded-xl shadow mt-4">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-bold text-blue-700">All Applicants</h2>
+<button onclick="backDashboard()" class="bg-gray-500 text-white px-3 py-1 rounded text-xs">
+Back
+</button>
+</div>
+
+<p class="mb-4">
+Total Applicants:
+<span id="totalApplicantsText" class="font-bold text-blue-600"></span>
+</p>
+
+<ul id="applicantNames" class="list-disc pl-6 space-y-1 text-sm"></ul>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const ADMIN_PASSWORD = "RadzMil0909";
+const form = document.getElementById('registrationForm');
+let currentSection = "";
+
+function showLogin(){
+document.getElementById('loginModal').classList.remove('hidden');
+}
+
+function loginAdmin(){
+if(document.getElementById('adminPassword').value === ADMIN_PASSWORD){
+document.getElementById('loginModal').classList.add('hidden');
+document.getElementById('registrationSection').classList.add('hidden');
+document.getElementById('adminSection').classList.remove('hidden');
+updateCounts();
+}else alert("Wrong Password!");
+}
+
+function logoutAdmin(){
+document.getElementById('adminSection').classList.add('hidden');
+document.getElementById('registrationSection').classList.remove('hidden');
+document.getElementById('tableView').classList.add('hidden');
+document.getElementById('allApplicantsSimple').classList.add('hidden');
+}
+
+function saveApplicants(data){ localStorage.setItem('applicants', JSON.stringify(data)); }
+function getApplicants(){ return JSON.parse(localStorage.getItem('applicants') || '[]'); }
+
+function updateCounts(){
+let data=getApplicants();
+document.getElementById('pendingCount').innerText = data.filter(a=>a.status==="Pending").length;
+document.getElementById('approvedCount').innerText = data.filter(a=>a.status==="Approved").length;
+document.getElementById('rejectedCount').innerText = data.filter(a=>a.status==="Rejected").length;
+document.getElementById('totalApplicantsCard').innerText = data.length;
+}
+
+function openSection(section){
+currentSection = section;
+document.getElementById('tableView').classList.remove('hidden');
+document.getElementById('allApplicantsSimple').classList.add('hidden');
+document.getElementById('sectionTitle').innerText = section + " Applicants";
+loadTable();
+}
+
+function openAllApplicants(){
+document.getElementById('tableView').classList.add('hidden');
+document.getElementById('allApplicantsSimple').classList.remove('hidden');
+
+let data = getApplicants();
+document.getElementById('totalApplicantsText').innerText = data.length;
+
+let list = document.getElementById('applicantNames');
+list.innerHTML="";
+
+data.forEach((a,i)=>{
+let li=document.createElement("li");
+li.innerText = (i+1) + ". " + a.name + " (" + a.status + ")";
+list.appendChild(li);
+});
+}
+
+function backDashboard(){
+document.getElementById('tableView').classList.add('hidden');
+document.getElementById('allApplicantsSimple').classList.add('hidden');
+updateCounts();
+}
+
+function loadTable(){
+let data=getApplicants();
+let table=document.getElementById('allTable');
+table.innerHTML="";
+let counter=1;
+
+data.forEach((a,i)=>{
+if(a.status===currentSection){
+let row=document.createElement("tr");
+row.classList.add("border-b");
+
+row.innerHTML=`
+<td class="p-2">${counter++}</td>
+<td class="p-2">${a.name}</td>
+<td class="p-2">${a.studentId}</td>
+<td class="p-2">${a.school}</td>
+<td class="p-2">${a.course}</td>
+<td class="p-2">${a.yearLevel}</td>
+<td class="p-2">${a.status}</td>
+<td class="p-2 space-x-1">
+${currentSection==="Pending" ? `
+<button onclick="updateStatus(${i},'Approved')" class="bg-green-500 text-white px-2 py-1 rounded text-xs">Approve</button>
+<button onclick="updateStatus(${i},'Rejected')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Reject</button>
+` : `
+<button onclick="deleteApplicant(${i})" class="bg-black text-white px-2 py-1 rounded text-xs">Delete</button>
+`}
+</td>`;
+table.appendChild(row);
+}
+});
+}
+
+function updateStatus(index,status){
+let data=getApplicants();
+data[index].status=status;
+saveApplicants(data);
+loadTable();
+updateCounts();
+}
+
+function deleteApplicant(index){
+let data=getApplicants();
+data.splice(index,1);
+saveApplicants(data);
+loadTable();
+updateCounts();
+}
+
+form.addEventListener('submit',function(e){
+e.preventDefault();
+let data=new FormData(form);
+let applicant={
+name:data.get('name'),
+studentId:data.get('studentId'),
+school:data.get('school'),
+course:data.get('course'),
+dob:data.get('dob'),
+email:data.get('email'),
+phone:data.get('phone'),
+yearLevel:data.get('yearLevel'),
+status:"Pending"
+};
+let all=getApplicants();
+all.push(applicant);
+saveApplicants(all);
+form.reset();
+alert("Application Submitted!");
+});
+
+</script>
+</body>
+</html>
